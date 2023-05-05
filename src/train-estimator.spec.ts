@@ -1,4 +1,5 @@
 import {
+  ApiException,
   InvalidTripInputException,
   Passenger,
   TripDetails,
@@ -43,10 +44,27 @@ describe("train estimator", function () {
   });
 
   it("should throw an exception if date is not valid", async function () {
-    tripDetails = new TripDetails("Bordeaux", "Paris", new Date("01/02/2022"));
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2022, 1, 13));
     tripRequest = new TripRequest(tripDetails, [new Passenger(2, [])]);
     await expect(
       async () => await trainTicketEstimator.estimate(tripRequest)
     ).rejects.toEqual(new InvalidTripInputException("Date is invalid"));
+  });
+
+  class FakeTrainTicketEstimatorFailedCallApi extends TrainTicketEstimator {
+    protected async getPrices(trainDetails: TripRequest) {
+      throw new ApiException();
+    }
+  }
+
+  it("should throw an exception when call SNCF API", async function () {
+    const fakeTrainTicketEstimatorFailedCallApi: FakeTrainTicketEstimatorFailedCallApi =
+      new FakeTrainTicketEstimatorFailedCallApi();
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2023, 7, 1));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(2, [])]);
+    await expect(
+      async () =>
+        await fakeTrainTicketEstimatorFailedCallApi.estimate(tripRequest)
+    ).rejects.toBeInstanceOf(ApiException);
   });
 });
