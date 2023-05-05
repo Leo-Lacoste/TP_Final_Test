@@ -83,4 +83,14 @@ describe("train estimator", function () {
       async () => await fakeTrainTicketEstimator.estimate(tripRequest)
     ).rejects.toEqual(new InvalidTripInputException("Age is invalid"));
   });
+
+  it("should return 0 when passenger age under 1 ", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2023, 7, 1));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(0.5, [])]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(0);
+  });
 });
