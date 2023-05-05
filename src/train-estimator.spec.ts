@@ -70,7 +70,7 @@ describe("train estimator", function () {
 
   class FakeTrainTicketEstimator extends TrainTicketEstimator {
     protected async getPrices(trainDetails: TripRequest) {
-      return 120;
+      return 100;
     }
   }
 
@@ -92,5 +92,45 @@ describe("train estimator", function () {
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(0);
+  });
+
+  it("should return a total 9 when passenger age under 3", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2023, 7, 1));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(3, [])]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(9);
+  });
+
+  it("should return a total 40 when passenger age between 3-17 and more than 30 days before travel", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2023, 7, 1));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(15, [])]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(40);
+  });
+
+  it("should return a total 60 when passenger age over 70 and more than 30 days before travel", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2023, 7, 1));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(70, [])]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(60);
+  });
+
+  it("should return a total 100 when passenger age is 43 and more than 30 days before travel", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2023, 7, 1));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(43, [])]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(100);
   });
 });
