@@ -150,7 +150,7 @@ describe("train estimator", function () {
     expect(result).toBe(102);
   });
 
-  it("should return a total 102 when passenger age over 70 and travel has been in 29 days", async function () {
+  it("should return a total 106 when passenger age over 70 and travel has been in 29 days", async function () {
     const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(7));
@@ -158,5 +158,15 @@ describe("train estimator", function () {
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(106);
+  });
+
+  it("should return a total 180 when passenger age over 70 and travel has been in 4 days", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(80, [])]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(180);
   });
 });
