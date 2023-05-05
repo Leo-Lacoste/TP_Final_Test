@@ -67,4 +67,20 @@ describe("train estimator", function () {
         await fakeTrainTicketEstimatorFailedCallApi.estimate(tripRequest)
     ).rejects.toBeInstanceOf(ApiException);
   });
+
+  class FakeTrainTicketEstimator extends TrainTicketEstimator {
+    protected async getPrices(trainDetails: TripRequest) {
+      return 120;
+    }
+  }
+
+  it("should throw an exception when age is not valid (< 0)", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2023, 7, 1));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(-1, [])]);
+    await expect(
+      async () => await fakeTrainTicketEstimator.estimate(tripRequest)
+    ).rejects.toEqual(new InvalidTripInputException("Age is invalid"));
+  });
 });
