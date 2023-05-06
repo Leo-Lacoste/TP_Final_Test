@@ -1,5 +1,6 @@
 import {
   ApiException,
+  DiscountCard,
   InvalidTripInputException,
   Passenger,
   TripDetails,
@@ -168,5 +169,136 @@ describe("train estimator", function () {
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(180);
+  });
+
+  it("should return a total 1 when passenger have TrainStroke staff card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(34, [DiscountCard.TrainStroke]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(1);
+  });
+
+  it("should return a total 160 when passenger age over 70 and travel has been in 4 days and got Senior Card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(75, [DiscountCard.Senior]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(160);
+  });
+
+  it("should return a total 220 when passenger age under 70 and travel has been in 4 days and got Senior Card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(53, [DiscountCard.Senior]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(220);
+  });
+
+  it("should return a total 400 when 2 passengers age over 18 and travel has been in 4 days and got each Couple Card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(25, [DiscountCard.Couple]),
+      new Passenger(32, [DiscountCard.Couple]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(400);
+  });
+
+  it("should return a total 400 when 2 passengers age over 18 and travel has been in 4 days and got one Couple Card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(25, [DiscountCard.Couple]),
+      new Passenger(32, []),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(400);
+  });
+
+  it("should return a total 380 when 1 passenger age over 18 with 1 minor and travel has been in 4 days and got one Couple Card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(25, [DiscountCard.Couple]),
+      new Passenger(15, []),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(380);
+  });
+
+  it("should return a total 210 when 1 passenger age over 18 and travel has been in 4 days and got one Half-Couple Card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(25, [DiscountCard.HalfCouple]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(210);
+  });
+
+  it("should return a total 40 when 2 senior passengers and travel has been in 36 days and got one Couple Card and Senior Card each", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(36));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(76, [DiscountCard.Senior]),
+      new Passenger(82, [DiscountCard.Senior, DiscountCard.Couple]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(40);
+  });
+
+  it("should return a total 61 when 2 major passengers and travel has been in 36 days and got one Couple Card and one TrainStroke staff Card", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(36));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(25, [DiscountCard.TrainStroke]),
+      new Passenger(27, [DiscountCard.Couple]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(61);
+  });
+
+  it("should return a total 200 with these conditions : \
+        - travel has been in 36 days \
+        - 1 passenger senior with Senior Card\
+        - 1 passenger senior with Couple Card\
+        - 1 passenger major with HalfCouple Card ", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(36));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(82, [DiscountCard.Senior]),
+      new Passenger(75, [DiscountCard.Couple]),
+      new Passenger(22, [DiscountCard.HalfCouple]),
+    ]);
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(200);
   });
 });
