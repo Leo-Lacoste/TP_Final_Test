@@ -24,7 +24,7 @@ describe("train estimator", function () {
   });
 
   it("should return 0 if we have no passengers", async function () {
-    tripDetails = new TripDetails("", "", new Date());
+    tripDetails = new TripDetails("Paris", "Toulouse", getDateDecalee(2));
     tripRequest = new TripRequest(tripDetails, []);
 
     const result = await trainTicketEstimator.estimate(tripRequest);

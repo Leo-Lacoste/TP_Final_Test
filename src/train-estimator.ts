@@ -6,11 +6,15 @@ import {
 } from "./model/trip.request";
 
 export class TrainTicketEstimator {
-  async estimate(trainDetails: TripRequest): Promise<number> {
-    if (trainDetails.passengers.length === 0) {
-      return 0;
-    }
+  static readonly DISCOUNT_20_PERCENT = 0.2;
+  static readonly INCREASE_20_PERCENT = 0.2;
+  static readonly DISCOUNT_40_PERCENT = 0.4;
+  static readonly DISCOUNT_10_PERCENT = 0.1;
+  static readonly TICKET_PRICE_9_EUR = 9;
+  static readonly TICKET_PRICE_1_EUR = 1;
+  static readonly DISCOUNT_2_PERCENT = 0.02;
 
+  async estimate(trainDetails: TripRequest): Promise<number> {
     if (trainDetails.details.from.trim().length === 0) {
       throw new InvalidTripInputException("Start city is invalid");
     }
@@ -33,7 +37,10 @@ export class TrainTicketEstimator {
       throw new InvalidTripInputException("Date is invalid");
     }
 
-    // TODO USE THIS LINE AT THE END
+    if (trainDetails.passengers.length === 0) {
+      return 0;
+    }
+
     const initialPrice = await this.getPrices(trainDetails);
 
     if (initialPrice === -1) {
@@ -43,90 +50,63 @@ export class TrainTicketEstimator {
     const passengers = trainDetails.passengers;
     let totalPrice = 0;
     let ticketPrice = initialPrice;
+    let hasCoupleCard = false;
+    let hasHalfCoupleCard = false;
+    let isMinor = false;
     for (let i = 0; i < passengers.length; i++) {
       if (passengers[i].age < 0) {
         throw new InvalidTripInputException("Age is invalid");
       }
-      if (passengers[i].age < 1) {
+      if (isNewBornPassenger(passengers[i].age)) {
         continue;
-      }
-      // Seniors
-      else if (passengers[i].age <= 17) {
-        ticketPrice = initialPrice * 0.6;
-      } else if (passengers[i].age >= 70) {
-        ticketPrice = initialPrice * 0.8;
-        if (passengers[i].discounts.includes(DiscountCard.Senior)) {
-          ticketPrice -= initialPrice * 0.2;
-        }
-      } else {
-        ticketPrice = initialPrice * 1.2;
-      }
-
-      const currentDay = new Date();
-      if (
-        trainDetails.details.when.getTime() >=
-        currentDay.setDate(currentDay.getDate() + 30)
-      ) {
-        ticketPrice -= initialPrice * 0.2;
-      } else if (
-        trainDetails.details.when.getTime() >
-        currentDay.setDate(currentDay.getDate() - 30 + 5)
-      ) {
-        const travelDay = trainDetails.details.when;
-        const currentDay2 = new Date();
-        //https://stackoverflow.com/questions/43735678/typescript-get-diffDateerence-between-two-dates-in-days
-        var diffDateMilliSecs = Math.abs(
-          travelDay.getTime() - currentDay2.getTime()
+      } else
+        ticketPrice = computeTicketAccordingAge(
+          passengers,
+          i,
+          ticketPrice,
+          initialPrice
         );
-        var diffDateDays = Math.ceil(diffDateMilliSecs / (1000 * 3600 * 24));
 
-        ticketPrice += (20 - diffDateDays) * 0.02 * initialPrice; // I tried. it works. I don't know why.
-      } else {
-        ticketPrice += initialPrice;
-      }
+      ticketPrice = computeTicketPriceAccordingToDate(
+        trainDetails,
+        ticketPrice,
+        initialPrice
+      );
 
-      if (passengers[i].age > 0 && passengers[i].age < 4) {
-        ticketPrice = 9;
+      if (isBabyPassenger(passengers[i].age)) {
+        ticketPrice = TrainTicketEstimator.TICKET_PRICE_9_EUR;
       }
 
       if (passengers[i].discounts.includes(DiscountCard.TrainStroke)) {
-        ticketPrice = 1;
+        ticketPrice = TrainTicketEstimator.TICKET_PRICE_1_EUR;
       }
 
       totalPrice += ticketPrice;
       ticketPrice = initialPrice;
-    }
 
-    if (passengers.length == 2) {
-      let hasCoupleCard = false;
-      let isMinor = false;
-      for (let i = 0; i < passengers.length; i++) {
+      if (passengers[i].age < 18) {
+        isMinor = true;
+      }
+
+      if (passengers.length == 2) {
         if (passengers[i].discounts.includes(DiscountCard.Couple)) {
           hasCoupleCard = true;
         }
-        if (passengers[i].age < 18) {
-          isMinor = true;
-        }
       }
-      if (hasCoupleCard && !isMinor) {
-        totalPrice -= initialPrice * 0.2 * 2;
-      }
-    }
 
-    if (passengers.length == 1) {
-      let hasHalfCoupleCard = false;
-      let isMinor = false;
-      for (let i = 0; i < passengers.length; i++) {
+      if (passengers.length == 1) {
         if (passengers[i].discounts.includes(DiscountCard.HalfCouple)) {
           hasHalfCoupleCard = true;
         }
-        if (passengers[i].age < 18) {
-          isMinor = true;
-        }
       }
-      if (hasHalfCoupleCard && !isMinor) {
-        totalPrice -= initialPrice * 0.1;
-      }
+    }
+
+    if (hasCoupleCard && !isMinor) {
+      totalPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT * 2;
+    }
+
+    if (hasHalfCoupleCard && !isMinor) {
+      totalPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_10_PERCENT;
     }
 
     return totalPrice;
@@ -143,4 +123,67 @@ export class TrainTicketEstimator {
       )?.price || -1
     );
   }
+}
+
+function computeTicketAccordingAge(
+  passengers: import("/Users/leolacoste/Documents/YnovM2/Methodologie de tests/TP_Final/src/model/trip.request").Passenger[],
+  i: number,
+  ticketPrice: any,
+  initialPrice: any
+) {
+  if (isMinorPassenger(passengers[i].age)) {
+    ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_40_PERCENT;
+  } else if (isSeniorPassenger(passengers[i].age)) {
+    ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
+    if (passengers[i].discounts.includes(DiscountCard.Senior)) {
+      ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
+    }
+  } else {
+    ticketPrice += initialPrice * TrainTicketEstimator.INCREASE_20_PERCENT;
+  }
+  return ticketPrice;
+}
+
+function isNewBornPassenger(age: number) {
+  return age < 1;
+}
+
+function isBabyPassenger(age: number) {
+  return age > 0 && age < 4;
+}
+
+function isMinorPassenger(age: number) {
+  return age <= 17;
+}
+
+function isSeniorPassenger(age: number) {
+  return age >= 70;
+}
+function computeTicketPriceAccordingToDate(
+  trainDetails: TripRequest,
+  ticketPrice: any,
+  initialPrice: any
+) {
+  const currentDay = new Date();
+  const travelDay = trainDetails.details.when;
+  var diffDateDays = computeDiffDateDays(currentDay, travelDay);
+
+  if (diffDateDays >= 30) {
+    ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
+  } else if (diffDateDays > 5) {
+    ticketPrice +=
+      (20 - diffDateDays) *
+      TrainTicketEstimator.DISCOUNT_2_PERCENT *
+      initialPrice;
+  } else {
+    ticketPrice += initialPrice;
+  }
+  return ticketPrice;
+}
+
+function computeDiffDateDays(previousDate: Date, lateDate: Date): number {
+  //https://stackoverflow.com/questions/43735678/typescript-get-diffDateerence-between-two-dates-in-days
+  var diffDateMilliSecs = Math.abs(previousDate.getTime() - lateDate.getTime());
+  var diffDateDays = Math.ceil(diffDateMilliSecs / (1000 * 3600 * 24));
+  return diffDateDays;
 }
