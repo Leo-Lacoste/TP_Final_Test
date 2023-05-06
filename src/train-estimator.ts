@@ -34,96 +34,102 @@ export class TrainTicketEstimator {
     }
 
     // TODO USE THIS LINE AT THE END
-    const b = await this.getPrices(trainDetails);
+    const initialPrice = await this.getPrices(trainDetails);
 
-    if (b === -1) {
+    if (initialPrice === -1) {
       throw new ApiException();
     }
 
-    const pasngers = trainDetails.passengers;
-    let tot = 0;
-    let tmp = b;
-    for (let i = 0; i < pasngers.length; i++) {
-      if (pasngers[i].age < 0) {
+    const passengers = trainDetails.passengers;
+    let totalPrice = 0;
+    let ticketPrice = initialPrice;
+    for (let i = 0; i < passengers.length; i++) {
+      if (passengers[i].age < 0) {
         throw new InvalidTripInputException("Age is invalid");
       }
-      if (pasngers[i].age < 1) {
+      if (passengers[i].age < 1) {
         continue;
       }
       // Seniors
-      else if (pasngers[i].age <= 17) {
-        tmp = b * 0.6;
-      } else if (pasngers[i].age >= 70) {
-        tmp = b * 0.8;
-        if (pasngers[i].discounts.includes(DiscountCard.Senior)) {
-          tmp -= b * 0.2;
+      else if (passengers[i].age <= 17) {
+        ticketPrice = initialPrice * 0.6;
+      } else if (passengers[i].age >= 70) {
+        ticketPrice = initialPrice * 0.8;
+        if (passengers[i].discounts.includes(DiscountCard.Senior)) {
+          ticketPrice -= initialPrice * 0.2;
         }
       } else {
-        tmp = b * 1.2;
+        ticketPrice = initialPrice * 1.2;
       }
 
-      const d = new Date();
-      if (trainDetails.details.when.getTime() >= d.setDate(d.getDate() + 30)) {
-        tmp -= b * 0.2;
-      } else if (
-        trainDetails.details.when.getTime() > d.setDate(d.getDate() - 30 + 5)
+      const currentDay = new Date();
+      if (
+        trainDetails.details.when.getTime() >=
+        currentDay.setDate(currentDay.getDate() + 30)
       ) {
-        const date1 = trainDetails.details.when;
-        const date2 = new Date();
-        //https://stackoverflow.com/questions/43735678/typescript-get-difference-between-two-dates-in-days
-        var diff = Math.abs(date1.getTime() - date2.getTime());
-        var diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+        ticketPrice -= initialPrice * 0.2;
+      } else if (
+        trainDetails.details.when.getTime() >
+        currentDay.setDate(currentDay.getDate() - 30 + 5)
+      ) {
+        const travelDay = trainDetails.details.when;
+        const currentDay2 = new Date();
+        //https://stackoverflow.com/questions/43735678/typescript-get-diffDateerence-between-two-dates-in-days
+        var diffDateMilliSecs = Math.abs(
+          travelDay.getTime() - currentDay2.getTime()
+        );
+        var diffDateDays = Math.ceil(diffDateMilliSecs / (1000 * 3600 * 24));
 
-        tmp += (20 - diffDays) * 0.02 * b; // I tried. it works. I don't know why.
+        ticketPrice += (20 - diffDateDays) * 0.02 * initialPrice; // I tried. it works. I don't know why.
       } else {
-        tmp += b;
+        ticketPrice += initialPrice;
       }
 
-      if (pasngers[i].age > 0 && pasngers[i].age < 4) {
-        tmp = 9;
+      if (passengers[i].age > 0 && passengers[i].age < 4) {
+        ticketPrice = 9;
       }
 
-      if (pasngers[i].discounts.includes(DiscountCard.TrainStroke)) {
-        tmp = 1;
+      if (passengers[i].discounts.includes(DiscountCard.TrainStroke)) {
+        ticketPrice = 1;
       }
 
-      tot += tmp;
-      tmp = b;
+      totalPrice += ticketPrice;
+      ticketPrice = initialPrice;
     }
 
-    if (pasngers.length == 2) {
-      let cp = false;
-      let mn = false;
-      for (let i = 0; i < pasngers.length; i++) {
-        if (pasngers[i].discounts.includes(DiscountCard.Couple)) {
-          cp = true;
+    if (passengers.length == 2) {
+      let hasCoupleCard = false;
+      let isMinor = false;
+      for (let i = 0; i < passengers.length; i++) {
+        if (passengers[i].discounts.includes(DiscountCard.Couple)) {
+          hasCoupleCard = true;
         }
-        if (pasngers[i].age < 18) {
-          mn = true;
-        }
-      }
-      if (cp && !mn) {
-        tot -= b * 0.2 * 2;
-      }
-    }
-
-    if (pasngers.length == 1) {
-      let cp = false;
-      let mn = false;
-      for (let i = 0; i < pasngers.length; i++) {
-        if (pasngers[i].discounts.includes(DiscountCard.HalfCouple)) {
-          cp = true;
-        }
-        if (pasngers[i].age < 18) {
-          mn = true;
+        if (passengers[i].age < 18) {
+          isMinor = true;
         }
       }
-      if (cp && !mn) {
-        tot -= b * 0.1;
+      if (hasCoupleCard && !isMinor) {
+        totalPrice -= initialPrice * 0.2 * 2;
       }
     }
 
-    return tot;
+    if (passengers.length == 1) {
+      let hasHalfCoupleCard = false;
+      let isMinor = false;
+      for (let i = 0; i < passengers.length; i++) {
+        if (passengers[i].discounts.includes(DiscountCard.HalfCouple)) {
+          hasHalfCoupleCard = true;
+        }
+        if (passengers[i].age < 18) {
+          isMinor = true;
+        }
+      }
+      if (hasHalfCoupleCard && !isMinor) {
+        totalPrice -= initialPrice * 0.1;
+      }
+    }
+
+    return totalPrice;
   }
 
   protected async getPrices(trainDetails: TripRequest) {
