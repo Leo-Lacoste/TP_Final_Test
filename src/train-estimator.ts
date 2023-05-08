@@ -166,6 +166,7 @@ function computeTicketPriceAccordingToDate(
   const currentDay = new Date();
   const travelDay = trainDetails.details.when;
   var diffDateDays = computeDiffDateDays(currentDay, travelDay);
+  var diffDateHours = computeDiffDateHours(currentDay, travelDay);
 
   if (diffDateDays >= 30) {
     ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
@@ -174,8 +175,10 @@ function computeTicketPriceAccordingToDate(
       (20 - diffDateDays) *
       TrainTicketEstimator.INCREASE_2_PERCENT *
       initialPrice;
-  } else {
+  } else if (diffDateHours > 6) {
     ticketPrice += initialPrice;
+  } else {
+    ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
   }
   return ticketPrice;
 }
@@ -186,4 +189,11 @@ function computeDiffDateDays(previousDate: Date, lateDate: Date): number {
     previousDate.getTime() - lateDate.getTime()
   );
   return Math.ceil(diffDateMilliSecs / (1000 * 3600 * 24));
+}
+
+function computeDiffDateHours(previousDate: Date, lateDate: Date): number {
+  const diffDateMilliSecs = Math.abs(
+    previousDate.getTime() - lateDate.getTime()
+  );
+  return Math.ceil(diffDateMilliSecs / (1000 * 3600));
 }

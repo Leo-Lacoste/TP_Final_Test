@@ -19,6 +19,12 @@ describe("train estimator", function () {
     return date;
   }
 
+  function getHoursDecalee(nbreHours: number): Date {
+    const date = new Date();
+    date.setHours(date.getHours() + nbreHours);
+    return date;
+  }
+
   beforeEach(() => {
     trainTicketEstimator = new TrainTicketEstimator();
   });
@@ -300,5 +306,27 @@ describe("train estimator", function () {
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(200);
+  });
+
+  it("should return a total 60 when passenger age over 70 and 5 hours before travel", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getHoursDecalee(5));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(70, [])]);
+
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(60);
+  });
+
+  it("should return a total 180 when passenger age over 70 and 9 hours before travel", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getHoursDecalee(9));
+    tripRequest = new TripRequest(tripDetails, [new Passenger(70, [])]);
+
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(180);
   });
 });
