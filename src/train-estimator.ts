@@ -129,7 +129,7 @@ function computeTicketAccordingAge(
   passenger: Passenger,
   ticketPrice: number,
   initialPrice: number
-) {
+): number {
   if (isMinorPassenger(passenger.age)) {
     ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_40_PERCENT;
   } else if (isSeniorPassenger(passenger.age)) {
@@ -143,26 +143,26 @@ function computeTicketAccordingAge(
   return ticketPrice;
 }
 
-function isNewBornPassenger(age: number) {
+function isNewBornPassenger(age: number): boolean {
   return age < 1;
 }
 
-function isBabyPassenger(age: number) {
+function isBabyPassenger(age: number): boolean {
   return age > 0 && age < 4;
 }
 
-function isMinorPassenger(age: number) {
+function isMinorPassenger(age: number): boolean {
   return age <= 17;
 }
 
-function isSeniorPassenger(age: number) {
+function isSeniorPassenger(age: number): boolean {
   return age >= 70;
 }
 function computeTicketPriceAccordingToDate(
   trainDetails: TripRequest,
   ticketPrice: number,
   initialPrice: number
-) {
+): number {
   const currentDay = new Date();
   const travelDay = trainDetails.details.when;
   var diffDateDays = computeDiffDateDays(currentDay, travelDay);
@@ -182,6 +182,8 @@ function computeTicketPriceAccordingToDate(
 
 function computeDiffDateDays(previousDate: Date, lateDate: Date): number {
   //https://stackoverflow.com/questions/43735678/typescript-get-diffDateerence-between-two-dates-in-days
-  var diffDateMilliSecs = Math.abs(previousDate.getTime() - lateDate.getTime());
+  const diffDateMilliSecs = Math.abs(
+    previousDate.getTime() - lateDate.getTime()
+  );
   return Math.ceil(diffDateMilliSecs / (1000 * 3600 * 24));
 }

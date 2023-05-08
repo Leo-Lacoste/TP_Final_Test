@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1683574080491" clover="3.2.0">
-  <project timestamp="1683574080491" name="All files">
-    <metrics statements="218" coveredstatements="206" conditionals="61" coveredconditionals="60" methods="18" coveredmethods="17" elements="297" coveredelements="283" complexity="0" loc="218" ncloc="218" packages="2" files="2" classes="2"/>
+<coverage generated="1683574380419" clover="3.2.0">
+  <project timestamp="1683574380419" name="All files">
+    <metrics statements="220" coveredstatements="208" conditionals="61" coveredconditionals="60" methods="18" coveredmethods="17" elements="299" coveredelements="285" complexity="0" loc="220" ncloc="220" packages="2" files="2" classes="2"/>
     <package name="src">
-      <metrics statements="187" coveredstatements="175" conditionals="52" coveredconditionals="51" methods="10" coveredmethods="9"/>
+      <metrics statements="189" coveredstatements="177" conditionals="52" coveredconditionals="51" methods="10" coveredmethods="9"/>
       <file name="train-estimator.ts" path="/Users/leolacoste/Documents/YnovM2/Methodologie de tests/TP_Final/src/train-estimator.ts">
-        <metrics statements="187" coveredstatements="175" conditionals="52" coveredconditionals="51" methods="10" coveredmethods="9"/>
+        <metrics statements="189" coveredstatements="177" conditionals="52" coveredconditionals="51" methods="10" coveredmethods="9"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -193,6 +193,8 @@
         <line num="185" count="24" type="stmt"/>
         <line num="186" count="24" type="stmt"/>
         <line num="187" count="24" type="stmt"/>
+        <line num="188" count="24" type="stmt"/>
+        <line num="189" count="24" type="stmt"/>
       </file>
     </package>
     <package name="src.model">
