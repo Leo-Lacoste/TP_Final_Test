@@ -182,8 +182,8 @@ function computeTicketPriceAccordingToDate(
 ): number {
   const currentDay = new Date();
   const travelDay = trainDetails.details.when;
-  var diffDateDays = computeDiffDateDays(currentDay, travelDay);
-  var diffDateHours = computeDiffDateHours(currentDay, travelDay);
+  const diffDateDays = computeDiffDateDays(currentDay, travelDay);
+  const diffDateHours = computeDiffDateHours(currentDay, travelDay);
 
   if (diffDateDays >= 30) {
     ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
