@@ -329,4 +329,35 @@ describe("train estimator", function () {
 
     expect(result).toBe(180);
   });
+
+  it("should return a total 280 when a family (70 and 17 age) got Family discount card and 9 hours before travel", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getHoursDecalee(9));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(70, [DiscountCard.Family, DiscountCard.Senior], "Dupond"),
+      new Passenger(17, [], "Dupond"),
+    ]);
+
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(280);
+  });
+  it("should return a total 880 when we got 2 family (70, 17 for the first and 53, 45 for the second) \
+      and got Family discount card and one guy alone and 9 hours before travel", async function () {
+    const fakeTrainTicketEstimator: FakeTrainTicketEstimator =
+      new FakeTrainTicketEstimator();
+    tripDetails = new TripDetails("Bordeaux", "Paris", getHoursDecalee(9));
+    tripRequest = new TripRequest(tripDetails, [
+      new Passenger(70, [DiscountCard.Family, DiscountCard.Senior], "Dupond"),
+      new Passenger(17, [], "Dupond"),
+      new Passenger(53, [DiscountCard.Family], "Toto"),
+      new Passenger(45, [DiscountCard.Couple], "Toto"),
+      new Passenger(63, [], "Tutu"),
+    ]);
+
+    const result = await fakeTrainTicketEstimator.estimate(tripRequest);
+
+    expect(result).toBe(880);
+  });
 });

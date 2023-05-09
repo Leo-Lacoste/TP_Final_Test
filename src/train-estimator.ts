@@ -9,6 +9,7 @@ import {
 export class TrainTicketEstimator {
   static readonly DISCOUNT_20_PERCENT = 0.2;
   static readonly INCREASE_20_PERCENT = 0.2;
+  static readonly DISCOUNT_30_PERCENT = 0.3;
   static readonly DISCOUNT_40_PERCENT = 0.4;
   static readonly DISCOUNT_10_PERCENT = 0.1;
   static readonly TICKET_PRICE_9_EUR = 9;
@@ -54,18 +55,23 @@ export class TrainTicketEstimator {
     let hasCoupleCard = false;
     let hasHalfCoupleCard = false;
     let isMinor = false;
+    const familyMembers: Passenger[] = getPassengersWithFamilyCard(passengers);
     for (let i = 0; i < passengers.length; i++) {
+      let isAFamilyMember: boolean = false;
       if (passengers[i].age < 0) {
         throw new InvalidTripInputException("Age is invalid");
       }
       if (isNewBornPassenger(passengers[i].age)) {
         continue;
-      } else
+      } else {
+        isAFamilyMember = familyMembers.includes(passengers[i]);
         ticketPrice = computeTicketAccordingAge(
           passengers[i],
           ticketPrice,
-          initialPrice
+          initialPrice,
+          isAFamilyMember
         );
+      }
 
       ticketPrice = computeTicketPriceAccordingToDate(
         trainDetails,
@@ -81,6 +87,10 @@ export class TrainTicketEstimator {
         ticketPrice = TrainTicketEstimator.TICKET_PRICE_1_EUR;
       }
 
+      if (isAFamilyMember) {
+        ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_30_PERCENT;
+      }
+
       totalPrice += ticketPrice;
       ticketPrice = initialPrice;
 
@@ -89,13 +99,19 @@ export class TrainTicketEstimator {
       }
 
       if (passengers.length == 2) {
-        if (passengers[i].discounts.includes(DiscountCard.Couple)) {
+        if (
+          passengers[i].discounts.includes(DiscountCard.Couple) &&
+          !isAFamilyMember
+        ) {
           hasCoupleCard = true;
         }
       }
 
       if (passengers.length == 1) {
-        if (passengers[i].discounts.includes(DiscountCard.HalfCouple)) {
+        if (
+          passengers[i].discounts.includes(DiscountCard.HalfCouple) &&
+          !isAFamilyMember
+        ) {
           hasHalfCoupleCard = true;
         }
       }
@@ -128,13 +144,14 @@ export class TrainTicketEstimator {
 function computeTicketAccordingAge(
   passenger: Passenger,
   ticketPrice: number,
-  initialPrice: number
+  initialPrice: number,
+  isAFamilyMember: boolean
 ): number {
   if (isMinorPassenger(passenger.age)) {
     ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_40_PERCENT;
   } else if (isSeniorPassenger(passenger.age)) {
     ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
-    if (passenger.discounts.includes(DiscountCard.Senior)) {
+    if (passenger.discounts.includes(DiscountCard.Senior) && !isAFamilyMember) {
       ticketPrice -= initialPrice * TrainTicketEstimator.DISCOUNT_20_PERCENT;
     }
   } else {
@@ -196,4 +213,18 @@ function computeDiffDateHours(previousDate: Date, lateDate: Date): number {
     previousDate.getTime() - lateDate.getTime()
   );
   return Math.ceil(diffDateMilliSecs / (1000 * 3600));
+}
+
+function getPassengersWithFamilyCard(passengers: Passenger[]) {
+  let familyMemberWithDiscountCard: Passenger[] = [];
+
+  const passengersNamesWithFamilyCard = passengers
+    .filter((passenger) => passenger.discounts.includes(DiscountCard.Family))
+    .map((passenger) => passenger.name);
+
+  for (let i = 0; i < passengers.length; i++) {
+    if (passengersNamesWithFamilyCard.includes(passengers[i].name!))
+      familyMemberWithDiscountCard.push(passengers[i]);
+  }
+  return familyMemberWithDiscountCard;
 }
