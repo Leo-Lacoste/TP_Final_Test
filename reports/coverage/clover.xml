@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1683661087854" clover="3.2.0">
-  <project timestamp="1683661087854" name="All files">
-    <metrics statements="270" coveredstatements="258" conditionals="74" coveredconditionals="73" methods="20" coveredmethods="19" elements="364" coveredelements="350" complexity="0" loc="270" ncloc="270" packages="2" files="2" classes="2"/>
+<coverage generated="1683661442243" clover="3.2.0">
+  <project timestamp="1683661442243" name="All files">
+    <metrics statements="272" coveredstatements="260" conditionals="74" coveredconditionals="73" methods="20" coveredmethods="19" elements="366" coveredelements="352" complexity="0" loc="272" ncloc="272" packages="2" files="2" classes="2"/>
     <package name="src">
-      <metrics statements="228" coveredstatements="216" conditionals="65" coveredconditionals="64" methods="12" coveredmethods="11"/>
-      <file name="train-estimator.ts" path="/Users/leolacoste/Documents/YnovM2/Methodologie de tests/TP_Final/src/train-estimator.ts">
-        <metrics statements="228" coveredstatements="216" conditionals="65" coveredconditionals="64" methods="12" coveredmethods="11"/>
+      <metrics statements="230" coveredstatements="218" conditionals="65" coveredconditionals="64" methods="12" coveredmethods="11"/>
+      <file name="train-estimator.ts" path="/Users/yaaqoub/Projets/node/TP_Final_Test/src/train-estimator.ts">
+        <metrics statements="230" coveredstatements="218" conditionals="65" coveredconditionals="64" methods="12" coveredmethods="11"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -226,19 +226,21 @@
         <line num="218" count="23" type="cond" truecount="1" falsecount="0"/>
         <line num="219" count="23" type="stmt"/>
         <line num="220" count="23" type="stmt"/>
-        <line num="221" count="23" type="cond" truecount="1" falsecount="0"/>
+        <line num="221" count="23" type="stmt"/>
         <line num="222" count="23" type="cond" truecount="1" falsecount="0"/>
         <line num="223" count="23" type="cond" truecount="1" falsecount="0"/>
-        <line num="224" count="35" type="stmt"/>
-        <line num="225" count="35" type="cond" truecount="1" falsecount="0"/>
+        <line num="224" count="23" type="stmt"/>
+        <line num="225" count="23" type="cond" truecount="1" falsecount="0"/>
         <line num="226" count="35" type="stmt"/>
-        <line num="227" count="23" type="stmt"/>
-        <line num="228" count="23" type="stmt"/>
+        <line num="227" count="35" type="cond" truecount="1" falsecount="0"/>
+        <line num="228" count="35" type="stmt"/>
+        <line num="229" count="23" type="stmt"/>
+        <line num="230" count="23" type="stmt"/>
       </file>
     </package>
     <package name="src.model">
       <metrics statements="42" coveredstatements="42" conditionals="9" coveredconditionals="9" methods="8" coveredmethods="8"/>
-      <file name="trip.request.ts" path="/Users/leolacoste/Documents/YnovM2/Methodologie de tests/TP_Final/src/model/trip.request.ts">
+      <file name="trip.request.ts" path="/Users/yaaqoub/Projets/node/TP_Final_Test/src/model/trip.request.ts">
         <metrics statements="42" coveredstatements="42" conditionals="9" coveredconditionals="9" methods="8" coveredmethods="8"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="cond" truecount="1" falsecount="0"/>

@@ -41,6 +41,7 @@ describe("train estimator", function () {
   it("should throw an exception if the start city is not valid", async function () {
     tripDetails = new TripDetails("", "", new Date());
     tripRequest = new TripRequest(tripDetails, [new Passenger(2, [])]);
+
     await expect(
       async () => await trainTicketEstimator.estimate(tripRequest)
     ).rejects.toEqual(new InvalidTripInputException("Start city is invalid"));
@@ -49,6 +50,7 @@ describe("train estimator", function () {
   it("should throw an exception if the destination city is not valid", async function () {
     tripDetails = new TripDetails("Bordeaux", "", new Date());
     tripRequest = new TripRequest(tripDetails, [new Passenger(2, [])]);
+
     await expect(
       async () => await trainTicketEstimator.estimate(tripRequest)
     ).rejects.toEqual(
@@ -59,6 +61,7 @@ describe("train estimator", function () {
   it("should throw an exception if date is not valid", async function () {
     tripDetails = new TripDetails("Bordeaux", "Paris", new Date(2022, 1, 13));
     tripRequest = new TripRequest(tripDetails, [new Passenger(2, [])]);
+
     await expect(
       async () => await trainTicketEstimator.estimate(tripRequest)
     ).rejects.toEqual(new InvalidTripInputException("Date is invalid"));
@@ -75,6 +78,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimatorFailedCallApi();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(35));
     tripRequest = new TripRequest(tripDetails, [new Passenger(2, [])]);
+
     await expect(
       async () =>
         await fakeTrainTicketEstimatorFailedCallApi.estimate(tripRequest)
@@ -92,6 +96,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(35));
     tripRequest = new TripRequest(tripDetails, [new Passenger(-1, [])]);
+
     await expect(
       async () => await fakeTrainTicketEstimator.estimate(tripRequest)
     ).rejects.toEqual(new InvalidTripInputException("Age is invalid"));
@@ -102,6 +107,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(35));
     tripRequest = new TripRequest(tripDetails, [new Passenger(0.5, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(0);
@@ -112,6 +118,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(35));
     tripRequest = new TripRequest(tripDetails, [new Passenger(3, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(9);
@@ -122,6 +129,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(35));
     tripRequest = new TripRequest(tripDetails, [new Passenger(15, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(40);
@@ -132,6 +140,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(35));
     tripRequest = new TripRequest(tripDetails, [new Passenger(70, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(60);
@@ -142,6 +151,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(35));
     tripRequest = new TripRequest(tripDetails, [new Passenger(43, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(100);
@@ -152,6 +162,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(29));
     tripRequest = new TripRequest(tripDetails, [new Passenger(43, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(102);
@@ -162,6 +173,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(7));
     tripRequest = new TripRequest(tripDetails, [new Passenger(80, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(106);
@@ -172,6 +184,7 @@ describe("train estimator", function () {
       new FakeTrainTicketEstimator();
     tripDetails = new TripDetails("Bordeaux", "Paris", getDateDecalee(4));
     tripRequest = new TripRequest(tripDetails, [new Passenger(80, [])]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(180);
@@ -184,6 +197,7 @@ describe("train estimator", function () {
     tripRequest = new TripRequest(tripDetails, [
       new Passenger(34, [DiscountCard.TrainStroke]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(1);
@@ -196,6 +210,7 @@ describe("train estimator", function () {
     tripRequest = new TripRequest(tripDetails, [
       new Passenger(75, [DiscountCard.Senior]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(160);
@@ -208,6 +223,7 @@ describe("train estimator", function () {
     tripRequest = new TripRequest(tripDetails, [
       new Passenger(53, [DiscountCard.Senior]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(220);
@@ -221,6 +237,7 @@ describe("train estimator", function () {
       new Passenger(25, [DiscountCard.Couple]),
       new Passenger(32, [DiscountCard.Couple]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(400);
@@ -234,6 +251,7 @@ describe("train estimator", function () {
       new Passenger(25, [DiscountCard.Couple]),
       new Passenger(32, []),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(400);
@@ -247,6 +265,7 @@ describe("train estimator", function () {
       new Passenger(25, [DiscountCard.Couple]),
       new Passenger(15, []),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(380);
@@ -259,6 +278,7 @@ describe("train estimator", function () {
     tripRequest = new TripRequest(tripDetails, [
       new Passenger(25, [DiscountCard.HalfCouple]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(210);
@@ -272,6 +292,7 @@ describe("train estimator", function () {
       new Passenger(76, [DiscountCard.Senior]),
       new Passenger(82, [DiscountCard.Senior, DiscountCard.Couple]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(40);
@@ -285,6 +306,7 @@ describe("train estimator", function () {
       new Passenger(25, [DiscountCard.TrainStroke]),
       new Passenger(27, [DiscountCard.Couple]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(61);
@@ -303,6 +325,7 @@ describe("train estimator", function () {
       new Passenger(75, [DiscountCard.Couple]),
       new Passenger(22, [DiscountCard.HalfCouple]),
     ]);
+
     const result = await fakeTrainTicketEstimator.estimate(tripRequest);
 
     expect(result).toBe(200);
